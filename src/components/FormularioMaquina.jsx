@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function FormularioMaquina({ agregarMaquina, maquinas = [] }) {
-  // Estados para los campos técnicos (RF-05 y RF-06)
+
     const [codigo, setCodigo] = useState("");
     const [tipo, setTipo] = useState("");
     const [marca, setMarca] = useState("");
@@ -11,7 +11,6 @@ function FormularioMaquina({ agregarMaquina, maquinas = [] }) {
     const [consumoKwh, setConsumoKwh] = useState("");
     const [estado, setEstado] = useState("Disponible");
 
-    // Estados de retroalimentación
     const [mensajeError, setMensajeError] = useState("");
     const [mensajeExito, setMensajeExito] = useState("");
 
@@ -25,7 +24,6 @@ function FormularioMaquina({ agregarMaquina, maquinas = [] }) {
         const litrosNum = Number(litrosAgua);
         const kwhNum = Number(consumoKwh);
 
-        // 1. Validación de código duplicado (Unicidad de identificador RF-05)
         const codigoExistente = maquinas.some(
         (m) => m.codigo.trim().toUpperCase() === codigoFormateado
         );
@@ -35,7 +33,6 @@ function FormularioMaquina({ agregarMaquina, maquinas = [] }) {
         return;
         }
 
-        // 2. Validación de campos obligatorios y tipos de datos numéricos
         const esCapacidadValida =
         capacidadKg.trim() !== "" &&
         !isNaN(capacidadNum) &&
@@ -66,7 +63,6 @@ function FormularioMaquina({ agregarMaquina, maquinas = [] }) {
         return;
         }
 
-        // Objeto listo para almacenar en el estado central
         const nuevaMaquina = {
         id: Date.now(),
         codigo: codigoFormateado,
@@ -81,7 +77,6 @@ function FormularioMaquina({ agregarMaquina, maquinas = [] }) {
 
         agregarMaquina(nuevaMaquina);
 
-        // Mensaje de confirmación y limpieza de campos
         setMensajeExito(`Máquina "${codigoFormateado}" registrada exitosamente en el catálogo.`);
         setCodigo("");
         setTipo("");

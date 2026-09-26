@@ -18,7 +18,6 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
         <div className="col-md-6 col-lg-4 mb-4">
         <div className="card h-100 border border-secondary border-opacity-25 shadow-sm rounded-3 bg-white">
             
-            {/* Cabecera superior */}
             <div className="p-3 border-bottom border-light-subtle d-flex justify-content-between align-items-center bg-light">
             <div className="d-flex align-items-center gap-2">
                 <span className="badge bg-dark text-white fw-bold px-2 py-1 font-monospace">
@@ -34,7 +33,6 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
             </span>
             </div>
 
-            {/* Cuerpo principal */}
             <div className="card-body p-3">
             <div className="mb-3">
                 <h5 className="fw-bold text-dark mb-0 tracking-wide text-uppercase" style={{ letterSpacing: "0.5px" }}>
@@ -45,7 +43,6 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
                 </span>
             </div>
 
-            {/* Bloque técnico */}
             <div className="rounded-3 p-3 bg-light border border-secondary border-opacity-10 mb-3">
                 <div className="d-flex align-items-center justify-content-between py-1 border-bottom border-secondary border-opacity-10">
                 <span className="text-secondary small">Agua por ciclo</span>
@@ -62,7 +59,6 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
                 </div>
             </div>
 
-            {/* Acciones de gestión de estado operativo (RF-07) */}
             <div className="d-flex gap-2 align-items-center">
                 <select
                 className="form-select form-select-sm border-secondary border-opacity-25 small"
@@ -83,7 +79,6 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
                 </button>
             </div>
             </div>
-
         </div>
         </div>
     );
