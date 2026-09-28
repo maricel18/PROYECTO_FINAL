@@ -1,10 +1,24 @@
-function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, consumoKwh, estado, cambiarEstado, eliminarMaquina }) {
+function Maquina({ 
+    id, 
+    codigo, 
+    tipo, 
+    marca, 
+    modelo, 
+    capacidadKg, 
+    litrosAgua, 
+    consumoKwh, 
+    estado, 
+    cambiarEstado, 
+    eliminarMaquina 
+    }) {
     const getStatusBadge = () => {
         switch (estado) {
         case "Disponible":
             return "bg-success bg-opacity-10 text-success border border-success border-opacity-25";
+        case "En Uso":
         case "En Ciclo":
             return "bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25";
+        case "Mantenimiento":
         case "En Mantenimiento":
             return "bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50";
         case "Fuera de Servicio":
@@ -13,6 +27,9 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
             return "bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25";
         }
     };
+    
+    const aguaMostrar = (litrosAgua !== undefined && litrosAgua !== null) ? litrosAgua : 0;
+    const energiaMostrar = (consumoKwh !== undefined && consumoKwh !== null) ? consumoKwh : 1.2;
 
     return (
         <div className="col-md-6 col-lg-4 mb-4">
@@ -36,10 +53,10 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
             <div className="card-body p-3">
             <div className="mb-3">
                 <h5 className="fw-bold text-dark mb-0 tracking-wide text-uppercase" style={{ letterSpacing: "0.5px" }}>
-                {marca}
+                {marca || "ECOWASH"}
                 </h5>
                 <span className="text-secondary small">
-                {modelo} &bull; <strong className="text-dark">{capacidadKg} kg de carga</strong>
+                {modelo ? `${modelo} • ` : ""}<strong className="text-dark">{capacidadKg} kg de carga</strong>
                 </span>
             </div>
 
@@ -47,14 +64,14 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
                 <div className="d-flex align-items-center justify-content-between py-1 border-bottom border-secondary border-opacity-10">
                 <span className="text-secondary small">Agua por ciclo</span>
                 <span className="fw-bold font-monospace text-dark small">
-                    {litrosAgua} <span className="fw-normal text-secondary">L</span>
+                    {aguaMostrar} <span className="fw-normal text-secondary">L</span>
                 </span>
                 </div>
 
                 <div className="d-flex align-items-center justify-content-between py-1 pt-2">
                 <span className="text-secondary small">Consumo energía</span>
                 <span className="fw-bold font-monospace text-dark small">
-                    {consumoKwh} <span className="fw-normal text-secondary">kWh</span>
+                    {energiaMostrar} <span className="fw-normal text-secondary">kWh</span>
                 </span>
                 </div>
             </div>
@@ -66,16 +83,17 @@ function Maquina({ id, codigo, tipo, marca, modelo, capacidadKg, litrosAgua, con
                 onChange={(e) => cambiarEstado(id, e.target.value)}
                 >
                 <option value="Disponible">Disponible</option>
+                <option value="En Uso">En Uso</option>
                 <option value="En Ciclo">En Ciclo</option>
-                <option value="En Mantenimiento">En Mantenimiento</option>
+                <option value="Mantenimiento">Mantenimiento</option>
                 <option value="Fuera de Servicio">Fuera de Servicio</option>
                 </select>
+                
                 <button
-                className="btn btn-outline-danger btn-sm px-2"
-                title="Eliminar máquina"
+                className="btn btn-outline-danger btn-sm px-3"
                 onClick={() => eliminarMaquina(id)}
                 >
-                <i className="bi bi-trash"></i>
+                Eliminar
                 </button>
             </div>
             </div>
