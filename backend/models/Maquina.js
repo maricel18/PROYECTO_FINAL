@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-
 const Maquina = sequelize.define('Maquina', {
     id: {
         type: DataTypes.INTEGER,
@@ -13,23 +12,34 @@ const Maquina = sequelize.define('Maquina', {
         unique: true
     },
     tipo: {
-        type: DataTypes.STRING(30),
-        allowNull: false 
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+    marca: {
+        type: DataTypes.STRING(50),
+        allowNull: true
+    },
+    modelo: {
+        type: DataTypes.STRING(50),
+        allowNull: true
     },
     capacidadKg: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
-    estado: {
-        type: DataTypes.STRING(20),
-        defaultValue: 'Disponible' 
+    litrosAgua: {
+        type: DataTypes.FLOAT,
+        defaultValue: 45
     },
-    tiempoRestanteMin: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0
+    consumoKwh: {
+        type: DataTypes.FLOAT,
+        defaultValue: 1.2
+    },
+    estado: {
+        type: DataTypes.STRING(30),
+        defaultValue: 'Disponible'
     }
-    }, 
-    {
+    }, {
     tableName: 'Maquinas',
     timestamps: true
 });
