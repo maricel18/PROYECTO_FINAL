@@ -14,26 +14,13 @@ Proyecto desarrollado para la materia **Programación Web II** (Facultad de Inge
 
 ---
 
-Este repositorio contiene la interfaz cliente (Frontend) para la administración y catalogación de maquinaria de la lavandería autoservicio. 
+## Organización y vistas del sistema
 
-El objetivo principal es llevar un control riguroso de cada lavadora y secadora del local antes de habilitar los ciclos de lavado, registrando sus especificaciones técnicas de consumo para cruzar luego estos datos con las lecturas físicas de los medidores (SAGUAPAC y CRE) y detectar posibles fugas o sobrecostos.
-
-### Funcionalidades implementadas:
-* **Alta de Maquinaria:** Registro de lavadoras y secadoras con marca, modelo, capacidad en kg y código identificador de local (ej. `LAV-01`, `SEC-02`).
-* **Ficha Técnica de Consumo Base:** Parámetros de gasto proyectado en litros de agua por ciclo y kilovatios-hora (kWh) según el tipo de equipo.
-* **Control de Disponibilidad:** Cambio en tiempo real del estado de cada máquina (`Disponible`, `En Ciclo`, `En Mantenimiento` o `Fuera de Servicio`).
-* **Validación de Identificador Único:** Control en el formulario que impide registrar códigos repetidos para evitar conflictos de asignación en caja.
-* **Diseño Ejecutivo:** Interfaz limpia construida con Bootstrap 5 en paleta sobria (negro/gris), adaptable a computadoras de caja y pantallas móviles.
-
----
-
-## Organización del código
-
-```text
-src/
-|--components/
-│   |-- Encabezado.jsx          # Título y subtítulo parametrizables por props
-│   |-- FormularioMaquina.jsx   # Formulario controlado con validaciones y alertas
-│   |-- Maquina.jsx             # Tarjeta de presentación técnica y selector de estado
-|-- App.jsx                     # Manejo centralizado del estado del catálogo
-|-- main.jsx                    # Configuración inicial e importación de Bootstrap
+![LOGIN](image-1.png)
+![DASHBOARD](image-2.png)
+![EMPLEADOS Y ROLES](image-3.png)
+![MAQUINAS](image-4.png)
+![CONSUMO](image-5.png)
+![TARIFAS](image-6.png)
+![INDEPENDENCIAS](image-7.png)
+![REPORTES](image-8.png)
