@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 
-function Reportes({ maquinas }) {
+function Reportes({ maquinas = [] }) {
     const [historial, setHistorial] = useState([]);
     const [tarifas, setTarifas] = useState({ tarifaAgua: 0.02, tarifaElectricidad: 1.10 });
+    const [filtroFechaDesde, setFiltroFechaDesde] = useState('');
+    const [filtroFechaHasta, setFiltroFechaHasta] = useState('');
     const [filtroMaquina, setFiltroMaquina] = useState('Todas');
     const [filtroEvento, setFiltroEvento] = useState('Todos');
     const [cargando, setCargando] = useState(true);
 
     const cargarDatos = async () => {
+        setCargando(true);
         try {
         const [resHistorial, resTarifas] = await Promise.all([
             fetch('http://localhost:8080/api/reportes'),
@@ -17,13 +20,13 @@ function Reportes({ maquinas }) {
         const dataHistorial = await resHistorial.json();
         const dataTarifas = await resTarifas.json();
 
-        setHistorial(dataHistorial);
+        setHistorial(Array.isArray(dataHistorial) ? dataHistorial : []);
         if (dataTarifas && dataTarifas.tarifaAgua) {
             setTarifas(dataTarifas);
         }
-        setCargando(false);
         } catch (error) {
-        console.error(error);
+        console.error('Error al cargar datos de reportes:', error);
+        } finally {
         setCargando(false);
         }
     };
@@ -32,25 +35,79 @@ function Reportes({ maquinas }) {
         cargarDatos();
     }, []);
 
+    // Convierte cualquier formato (DD/MM/YYYY o YYYY-MM-DD) a milisegundos para comparar de forma exacta
+    const convertirFecha = (strFecha) => {
+        if (!strFecha) return null;
+        const str = String(strFecha).trim();
+
+        // Formato DD/MM/YYYY
+        if (str.includes('/')) {
+        const partes = str.split('/');
+        if (partes.length === 3) {
+            const dia = parseInt(partes[0], 10);
+            const mes = parseInt(partes[1], 10) - 1;
+            const anio = parseInt(partes[2], 10);
+            return new Date(anio, mes, dia).setHours(0, 0, 0, 0);
+        }
+        }
+
+        // Formato YYYY-MM-DD
+        if (str.includes('-')) {
+        const partes = str.split('T')[0].split('-');
+        if (partes.length === 3) {
+            const anio = parseInt(partes[0], 10);
+            const mes = parseInt(partes[1], 10) - 1;
+            const dia = parseInt(partes[2], 10);
+            return new Date(anio, mes, dia).setHours(0, 0, 0, 0);
+        }
+        }
+
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? null : d.setHours(0, 0, 0, 0);
+    };
+
+    // Filtrado reactivo en tiempo real
     const historialFiltrado = historial.filter((item) => {
         const cumpleMaquina = filtroMaquina === 'Todas' || item.codigoMaquina === filtroMaquina;
         const cumpleEvento = filtroEvento === 'Todos' || item.evento === filtroEvento;
-        return cumpleMaquina && cumpleEvento;
+
+        let cumpleFecha = true;
+        const tiempoItem = convertirFecha(item.fecha);
+        const tiempoDesde = convertirFecha(filtroFechaDesde);
+        const tiempoHasta = convertirFecha(filtroFechaHasta);
+
+        if (tiempoItem) {
+        if (tiempoDesde && tiempoItem < tiempoDesde) {
+            cumpleFecha = false;
+        }
+        if (tiempoHasta && tiempoItem > tiempoHasta) {
+            cumpleFecha = false;
+        }
+        }
+
+        return cumpleMaquina && cumpleEvento && cumpleFecha;
     });
 
-    const totalLitros = parseFloat(historialFiltrado.reduce((acc, curr) => acc + (curr.litrosConsumidos || 0), 0).toFixed(2));
-    const totalKwh = parseFloat(historialFiltrado.reduce((acc, curr) => acc + (curr.kwhConsumidos || 0), 0).toFixed(2));
+    const totalLitros = parseFloat(
+        historialFiltrado.reduce((acc, curr) => acc + (Number(curr.litrosConsumidos) || 0), 0).toFixed(2)
+    );
+    const totalKwh = parseFloat(
+        historialFiltrado.reduce((acc, curr) => acc + (Number(curr.kwhConsumidos) || 0), 0).toFixed(2)
+    );
 
-    const costoAgua = parseFloat((totalLitros * tarifas.tarifaAgua).toFixed(2));
-    const costoLuz = parseFloat((totalKwh * tarifas.tarifaElectricidad).toFixed(2));
+    const costoAgua = parseFloat((totalLitros * (tarifas.tarifaAgua || 0)).toFixed(2));
+    const costoLuz = parseFloat((totalKwh * (tarifas.tarifaElectricidad || 0)).toFixed(2));
     const costoTotal = parseFloat((costoAgua + costoLuz).toFixed(2));
 
     const descargarCSV = () => {
-        if (historialFiltrado.length === 0) return;
+        if (historialFiltrado.length === 0) {
+        alert('No hay registros en el rango seleccionado para exportar.');
+        return;
+        }
 
         const encabezados = ['ID,Fecha,Maquina,Evento,Detalle,Litros,KWh\n'];
         const filas = historialFiltrado.map(
-        (h) => `${h.id},${h.fecha},${h.codigoMaquina},"${h.evento}","${h.detalle}",${h.litrosConsumidos},${h.kwhConsumidos}`
+        (h) => `${h.id},${h.fecha},${h.codigoMaquina},"${h.evento}","${h.detalle}",${h.litrosConsumidos || 0},${h.kwhConsumidos || 0}`
         );
 
         const bom = '\uFEFF';
@@ -75,12 +132,22 @@ function Reportes({ maquinas }) {
             <div className="row g-3 align-items-end">
                 <div className="col-md-3">
                 <label className="form-label small fw-bold text-secondary">Desde</label>
-                <input type="date" className="form-control form-control-sm" />
+                <input
+                    type="date"
+                    className="form-control form-control-sm"
+                    value={filtroFechaDesde}
+                    onChange={(e) => setFiltroFechaDesde(e.target.value)}
+                />
                 </div>
 
                 <div className="col-md-3">
                 <label className="form-label small fw-bold text-secondary">Hasta</label>
-                <input type="date" className="form-control form-control-sm" />
+                <input
+                    type="date"
+                    className="form-control form-control-sm"
+                    value={filtroFechaHasta}
+                    onChange={(e) => setFiltroFechaHasta(e.target.value)}
+                />
                 </div>
 
                 <div className="col-md-3">
@@ -179,13 +246,13 @@ function Reportes({ maquinas }) {
                     <tr>
                     <td>Agua</td>
                     <td>{totalLitros} L</td>
-                    <td>Bs. {tarifas.tarifaAgua.toFixed(2)} / L</td>
+                    <td>Bs. {(tarifas.tarifaAgua || 0).toFixed(2)} / L</td>
                     <td className="fw-semibold">Bs. {costoAgua.toFixed(2)}</td>
                     </tr>
                     <tr>
                     <td>Electricidad</td>
                     <td>{totalKwh} kWh</td>
-                    <td>Bs. {tarifas.tarifaElectricidad.toFixed(2)} / kWh</td>
+                    <td>Bs. {(tarifas.tarifaElectricidad || 0).toFixed(2)} / kWh</td>
                     <td className="fw-semibold">Bs. {costoLuz.toFixed(2)}</td>
                     </tr>
                     <tr className="table-light fw-bold">
@@ -205,7 +272,7 @@ function Reportes({ maquinas }) {
             className="btn btn-sm text-white fw-semibold px-3 py-2"
             style={{ backgroundColor: '#1e485e' }}
             >
-            Generar reporte
+            Actualizar datos
             </button>
             <button
             type="button"
