@@ -35,12 +35,10 @@ function Reportes({ maquinas = [] }) {
         cargarDatos();
     }, []);
 
-    // Convierte cualquier formato (DD/MM/YYYY o YYYY-MM-DD) a milisegundos para comparar de forma exacta
     const convertirFecha = (strFecha) => {
         if (!strFecha) return null;
         const str = String(strFecha).trim();
 
-        // Formato DD/MM/YYYY
         if (str.includes('/')) {
         const partes = str.split('/');
         if (partes.length === 3) {
@@ -51,7 +49,6 @@ function Reportes({ maquinas = [] }) {
         }
         }
 
-        // Formato YYYY-MM-DD
         if (str.includes('-')) {
         const partes = str.split('T')[0].split('-');
         if (partes.length === 3) {
@@ -66,7 +63,6 @@ function Reportes({ maquinas = [] }) {
         return isNaN(d.getTime()) ? null : d.setHours(0, 0, 0, 0);
     };
 
-    // Filtrado reactivo en tiempo real
     const historialFiltrado = historial.filter((item) => {
         const cumpleMaquina = filtroMaquina === 'Todas' || item.codigoMaquina === filtroMaquina;
         const cumpleEvento = filtroEvento === 'Todos' || item.evento === filtroEvento;
